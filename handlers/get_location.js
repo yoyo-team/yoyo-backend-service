@@ -1,5 +1,5 @@
 let db=global.vars.db;
-let redis=global.vars.redis;
+let check=global.vars.check;
 
 module.exports.get=function(req,res)
 {
@@ -25,60 +25,45 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    redis.get(`access_token:${query.uid}`,function(err,str)
-    {
-        if(err)
+    check(query.uid,query.access_token)
+        .then(function()
         {
-            console.log(err);
+            let sql=`select location from yoyo.user where uid='${query.uid}'`;
+            console.log(sql);
+            db.query(sql,function(err,rows,fields)
+            {
+                if(err)
+                {
+                    console.log(err);
+                    res.status(200).json
+                    (
+                        {
+                            status:'db_error'
+                        }
+                    );
+                }
+                else
+                {
+                    res.status(200).json
+                    (
+                        {
+                            status:'ok',
+                            message:
+                                {
+                                    location:rows[0].location
+                                }
+                        }
+                    );
+                }
+            });
+        },function()
+        {
             res.status(200).json
             (
                 {
-                    status:'redis_error'
+                    status:'access_denied'
                 }
             );
-        }
-        else
-        {
-            if(str===query.access_token)
-            {
-                let sql=`select location from yoyo.user where uid='${query.uid}'`;
-                console.log(sql);
-                db.query(sql,function(err,rows,fields)
-                {
-                    if(err)
-                    {
-                        console.log(err);
-                        res.status(200).json
-                        (
-                            {
-                                status:'db_error'
-                            }
-                        );
-                    }
-                    else
-                    {
-                        res.status(200).json
-                        (
-                            {
-                                status:'ok',
-                                message:
-                                    {
-                                        location:rows[0].location
-                                    }
-                            }
-                        );
-                    }
-                });
-            }
-            else
-            {
-                res.status(200).json
-                (
-                    {
-                        status:'wrong_access_token'
-                    }
-                );
-            }
-        }
-    })
+        })
+    ;
 };
