@@ -5,17 +5,17 @@ let path=require('path');
 module.exports.get=function(req,res)
 {
     let query=req.query;
-    if(query.uid==='')
+    if(!query.cid)
     {
         res.status(200).json
         (
             {
-                status:'no_uid',
+                status:'no_cid',
             }
         );
         return ;
     }
-    let file=path.resolve(`./classes/${query.uid}/index.json`);
+    let file=path.resolve(`./classes/${query.cid}/index.json`);
     if(fs.existsSync(file))
     {
         file=fs.readFileSync(file);
