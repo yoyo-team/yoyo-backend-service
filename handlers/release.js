@@ -13,10 +13,48 @@ module.exports.post=function(req,res)
         let form=new formidable.IncomingForm();
         form.uploadDir=path.resolve('./tmp');
         form.keepExtensions=true;
-        form.on('error',function(err)
-        {
-            console.log(err);
-        });
+        // form.on('error',function(err)
+        // {
+        //     console.log(err);
+        //     res.status(200).json
+        //     (
+        //         {
+        //             status:'formidable_error'
+        //         }
+        //     )
+        // });
+        // form.on('progress',function(rec,exp)
+        // {
+        //     console.log('progress');
+        //     console.log(rec);
+        //     console.log(exp);
+        // });
+        // form.on('field',function(name,value)
+        // {
+        //     console.log('field');
+        //     console.log(name);
+        //     console.log(value);
+        // });
+        // form.on('fileBegin',function(file,name)
+        // {
+        //     console.log('file begin');
+        //     console.log(file);
+        //     console.log(name);
+        // });
+        // form.on('file',function(file,name)
+        // {
+        //     console.log('file');
+        //     console.log(file);
+        //     console.log(name);
+        // });
+        // form.on('aborted',function()
+        // {
+        //     console.log('abort');
+        // });
+        // form.on('end',function()
+        // {
+        //     console.log('end');
+        // });
         form.parse(req,function(err,fields,files)
         {
             if(err)
@@ -76,7 +114,7 @@ module.exports.post=function(req,res)
                 let sql=`insert into yoyo.class 
                         (cid, name, location, releaser) 
                         values 
-                        ('${cid}','${fields.name}','${fields.location}','${fields.releaser}');`;
+                        ('${cid}','${fields.name}','${fields.location}','${fields.releaser}'); `;
                 console.log(sql);
                 db.query(sql,function(err,result)
                 {
