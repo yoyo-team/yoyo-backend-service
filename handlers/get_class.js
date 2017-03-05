@@ -22,7 +22,13 @@ module.exports.get=function(req,res)
         console.log(file);
         try
         {
-            res.status(200).json(JSON.parse(file));
+            res.status(200).json
+            (
+                {
+                    status:'ok',
+                    message:JSON.parse(file)
+                }
+            );
         }
         catch(e)
         {
