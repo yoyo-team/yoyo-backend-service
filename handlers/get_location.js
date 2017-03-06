@@ -15,55 +15,56 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    if(!query.access_token)
+    // if(!query.access_token)
+    // {
+    //     res.status(200).json
+    //     (
+    //         {
+    //             status:'no_access_token'
+    //         }
+    //     );
+    //     return ;
+    // }
+    let sql=`select location from yoyo.user where uid='${query.uid}'`;
+    console.log(sql);
+    db.query(sql,function(err,rows,fields)
     {
-        res.status(200).json
-        (
-            {
-                status:'no_access_token'
-            }
-        );
-        return ;
-    }
-    check(query.uid,query.access_token)
-        .then(function()
+        if(err)
         {
-            let sql=`select location from yoyo.user where uid='${query.uid}'`;
-            console.log(sql);
-            db.query(sql,function(err,rows,fields)
-            {
-                if(err)
+            console.log(err);
+            res.status(200).json
+            (
                 {
-                    console.log(err);
-                    res.status(200).json
-                    (
-                        {
-                            status:'db_error'
-                        }
-                    );
+                    status:'db_error'
                 }
-                else
-                {
-                    res.status(200).json
-                    (
-                        {
-                            status:'ok',
-                            message:
-                                {
-                                    location:rows[0].location
-                                }
-                        }
-                    );
-                }
-            });
-        },function()
+            );
+        }
+        else
         {
             res.status(200).json
             (
                 {
-                    status:'access_denied'
+                    status:'ok',
+                    message:
+                        {
+                            location:rows[0].location
+                        }
                 }
             );
-        })
-    ;
+        }
+    });
+    // check(query.uid,query.access_token)
+    //     .then(function()
+    //     {
+    //
+    //     },function()
+    //     {
+    //         res.status(200).json
+    //         (
+    //             {
+    //                 status:'access_denied'
+    //             }
+    //         );
+    //     })
+    // ;
 };
