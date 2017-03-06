@@ -15,16 +15,16 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    if(!query.access_token)
-    {
-        res.status(200).json
-        (
-            {
-                status:'no_access_token'
-            }
-        );
-        return ;
-    }
+    // if(!query.access_token)
+    // {
+    //     res.status(200).json
+    //     (
+    //         {
+    //             status:'no_access_token'
+    //         }
+    //     );
+    //     return ;
+    // }
     if(!query.location)
     {
         res.status(200).json
@@ -35,55 +35,56 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    check(query.uid,query.access_token)
-        .then(function()
+    let sql=`update yoyo.user set location='${query.location}' where uid='${query.uid}'`;
+    console.log(sql);
+    db.query(sql,function(err,result)
+    {
+        if(err)
         {
-            let sql=`update yoyo.user set location='${query.location}' where uid='${query.uid}'`;
-            console.log(sql);
-            db.query(sql,function(err,result)
-            {
-                if(err)
-                {
-                    console.log(err);
-                    res.status(200).json
-                    (
-                        {
-                            status:'db_error'
-                        }
-                    );
-                }
-                else
-                {
-                    console.log(result);
-                    if(result.affectedRows===1)
-                    {
-                        res.status(200).json
-                        (
-                            {
-                                status:'ok'
-                            }
-                        );
-                    }
-                    else
-                    {
-                        res.status(200).json
-                        (
-                            {
-                                status:'no_effect',
-                                message:'设置location失败，用户可能不存在'
-                            }
-                        );
-                    }
-                }
-            });
-        },function()
-        {
+            console.log(err);
             res.status(200).json
             (
                 {
-                    status:'access_denied'
+                    status:'db_error'
                 }
             );
-        })
-    ;
+        }
+        else
+        {
+            console.log(result);
+            if(result.affectedRows===1)
+            {
+                res.status(200).json
+                (
+                    {
+                        status:'ok'
+                    }
+                );
+            }
+            else
+            {
+                res.status(200).json
+                (
+                    {
+                        status:'no_effect',
+                        message:'设置location失败，用户可能不存在'
+                    }
+                );
+            }
+        }
+    });
+    // check(query.uid,query.access_token)
+    //     .then(function()
+    //     {
+    //
+    //     },function()
+    //     {
+    //         res.status(200).json
+    //         (
+    //             {
+    //                 status:'access_denied'
+    //             }
+    //         );
+    //     })
+    // ;
 };
