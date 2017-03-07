@@ -63,13 +63,43 @@ module.exports.get=function(req,res)
             }
             else
             {
-                res.status(200).json
-                (
+                let sql=`insert into yoyo.user (uid,location) values ('${query.uid}','${query.location}'); `;
+                console.log(sql);
+                db.query(sql,function(err,result)
+                {
+                    if(err)
                     {
-                        status:'no_effect',
-                        message:'设置location失败，用户可能不存在'
+                        console.log(err);
+                        res.status(200).json
+                        (
+                            {
+                                status:'db_error'
+                            }
+                        );
                     }
-                );
+                    else
+                    {
+                        console.log(result);
+                        if (result.affectedRows === 1) {
+                            res.status(200).json
+                            (
+                                {
+                                    status: 'ok'
+                                }
+                            );
+                        }
+                        else
+                        {
+                            res.status(200).json
+                            (
+                                {
+                                    status:'no_effect',
+                                    message:'设置location失败'
+                                }
+                            );
+                        }
+                    }
+                });
             }
         }
     });
