@@ -15,41 +15,77 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    let file=path.resolve(`./classes/${query.cid}/index.json`);
-    if(fs.existsSync(file))
+    let sql=`select * from yoyo.class where cid='${query.cid}' ;`;
+    db.query(sql,function(err,rows,fields)
     {
-        file=fs.readFileSync(file);
-        console.log(file);
-        try
+        if(err)
         {
             res.status(200).json
             (
                 {
-                    status:'ok',
-                    message:JSON.parse(file)
+                    status:'db_error'
                 }
             );
+            console.log(err);
         }
-        catch(e)
+        else
         {
-            console.log(e);
-            res.status(200).json
-            (
-                {
-                    status:'json_parse_error',
-                    message:'转换课程内容时出错，该课程可能已毁坏'
-                }
-            );
-        }
-    }
-    else
-    {
-        res.status(200).json
-        (
+            if(rows.length===1)
             {
-                status:'not_exist',
-                message:'该课程不存在'
+                let file=path.resolve(`./classes/${query.cid}/index.json`);
+                if(fs.existsSync(file))
+                {
+                    file=fs.readFileSync(file);
+                    console.log(file);
+                    try
+                    {
+                        res.status(200).json
+                        (
+                            {
+                                status:'ok',
+                                message:
+                                    {
+                                        cid:query.cid,
+                                        meta:rows[0],
+                                        segments:JSON.parse(file)
+                                    }
+                            }
+                        );
+                    }
+                    catch(e)
+                    {
+                        console.log(e);
+                        res.status(200).json
+                        (
+                            {
+                                status:'json_parse_error',
+                                message:'转换课程内容时出错，该课程可能已毁坏'
+                            }
+                        );
+                    }
+                }
+                else
+                {
+                    res.status(200).json
+                    (
+                        {
+                            status:'not_exist',
+                            message:'该课程不存在'
+                        }
+                    );
+                }
             }
-        );
-    }
+            else
+            {
+                res.status(200).json
+                (
+                    {
+                        status:'not_exist',
+                        message:'该课程不存在'
+                    }
+                );
+            }
+        }
+    });
+
 };
