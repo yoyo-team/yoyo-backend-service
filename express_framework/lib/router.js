@@ -23,6 +23,7 @@ router.get('/', require('../../handlers/index').get);
 
 // 'register'
 router.get('/add_note', require('../../handlers/add_note').get);
+router.get('/delete_note', require('../../handlers/delete_note').get);
 router.get('/get_class', require('../../handlers/get_class').get);
 router.get('/get_location', require('../../handlers/get_location').get);
 router.get('/get_notes', require('../../handlers/get_notes').get);
