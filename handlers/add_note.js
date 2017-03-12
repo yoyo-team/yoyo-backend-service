@@ -33,9 +33,9 @@ module.exports.get=function(req,res)
         );
         return ;
     }
-    let sql=`insert into yoyo.note (uid,cid,segments) values ( '${query.uid}','${query.cid}','${query.segments}' );`
+    let sql=`select * from yoyo.note where cid='${query.cid}' and uid='${query.uid}' ; ` ;
     console.log(sql);
-    db.query(sql,function(err,result)
+    db.query(sql,function(err,rows)
     {
         if(err)
         {
@@ -49,12 +49,29 @@ module.exports.get=function(req,res)
         }
         else
         {
-            if(result.affectedRows===1)
+            if(rows.length>0)
             {
+                update();
+            }
+            else
+            {
+                insert();
+            }
+        }
+    });
+    function update()
+    {
+        let sql=`update yoyo.note set segments='${query.segments}' where cid='${query.cid}' and uid='${query.uid}' ;` ;
+        console.log(sql);
+        db.query(sql,function(err,result)
+        {
+            if(err)
+            {
+                console.log(err);
                 res.status(200).json
                 (
                     {
-                        status:'ok'
+                        status:'db_error'
                     }
                 );
             }
@@ -63,11 +80,38 @@ module.exports.get=function(req,res)
                 res.status(200).json
                 (
                     {
-                        status:'failed',
-                        message:'添加笔记失败'
+                        status:'ok'
                     }
                 );
             }
-        }
-    });
+        });
+    }
+    function insert()
+    {
+        let sql=`insert into yoyo.note (uid,cid,segments) values ( '${query.uid}','${query.cid}','${query.segments}' );`;
+        console.log(sql);
+        db.query(sql,function(err,result)
+        {
+            if(err)
+            {
+                console.log(err);
+                res.status(200).json
+                (
+                    {
+                        status:'db_error'
+                    }
+                );
+            }
+            else
+            {
+                res.status(200).json
+                (
+                    {
+                        status:'ok'
+                    }
+                );
+            }
+        });
+    }
+
 };
