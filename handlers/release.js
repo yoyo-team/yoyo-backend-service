@@ -1,6 +1,7 @@
 let db=global.vars.db;
 let formidable=require('formidable');
 let path=require('path');
+let tear_down = require('/web/server/java/yoyo');
 
 module.exports.post=function(req,res)
 {
@@ -109,49 +110,73 @@ module.exports.post=function(req,res)
                     );
                     return ;
                 }
-                tear_down(files[0]);
                 let cid=build_cid();
-                let sql=`insert into yoyo.class 
+                console.log(files.file.path);
+                if(files.file.name.split('.').pop()!=='ppt' && files.file.name.split('.').pop()!=='pptx')
+                {
+                    res.status(200).json
+                    (
+                        {
+                            status:'not_a_ppt(x)_file'
+                        }
+                    );
+                    return ;
+                }
+                tear_down(files.file.path,cid)
+                    .then(function(stdout)
+                    {
+                        let sql=`insert into yoyo.class 
                         (cid, name, location, releaser) 
                         values 
                         ('${cid}','${fields.name}','${fields.location}','${fields.releaser}'); `;
-                console.log(sql);
-                db.query(sql,function(err,result)
-                {
-                    if(err)
+                        console.log(sql);
+                        db.query(sql,function(err,result)
+                        {
+                            if(err)
+                            {
+                                console.log(err);
+                                res.status(200).json
+                                (
+                                    {
+                                        status:'db_error'
+                                    }
+                                )
+                            }
+                            else
+                            {
+                                if(result.affectedRows===1)
+                                {
+                                    res.status(200).json
+                                    (
+                                        {
+                                            status:'ok'
+                                        }
+                                    )
+                                }
+                                else
+                                {
+                                    console.log('发布课程失败 : ');
+                                    console.log(result);
+                                    res.status(200).json
+                                    (
+                                        {
+                                            status:'failed'
+                                        }
+                                    )
+                                }
+                            }
+                        });
+                    },function(err)
                     {
                         console.log(err);
                         res.status(200).json
                         (
                             {
-                                status:'db_error'
+                                status:'tear_down_error'
                             }
                         )
-                    }
-                    else
-                    {
-                        if(result.affectedRows===1)
-                        {
-                            res.status(200).json
-                            (
-                                {
-                                    status:'ok'
-                                }
-                            )
-                        }
-                        else
-                        {
-                            console.log('发布课程失败 : ');
-                            console.log(result);
-                            res.status(200).json
-                            (
-                                {
-                                    status:'failed'
-                                }
-                            )
-                        }
-                    }
-                });
+                    })
+                ;
             }
         });
     }
@@ -170,9 +195,4 @@ function build_cid()
         str+=(new Date().getTime()+Math.random()*1e20).toString(36);
     }
     return str.substr(0,16);
-}
-
-function tear_down(file)
-{
-
 }
