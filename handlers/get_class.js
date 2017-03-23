@@ -32,7 +32,7 @@ module.exports.get=function(req,res)
         {
             if(rows.length===1)
             {
-                let file=path.resolve(`/web/sites/luoc.co/yoyo/yoyo-loves-you/classes/${query.cid}/index.json`);
+                let file=path.resolve(`/web/sites/luoc.co/yoyo/classes/${query.cid}/index.json`);
                 if(fs.existsSync(file))
                 {
                     file=fs.readFileSync(file);
