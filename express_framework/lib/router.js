@@ -27,6 +27,7 @@ router.get('/delete_note', require('../../handlers/delete_note').get);
 router.get('/get_class', require('../../handlers/get_class').get);
 router.get('/get_location', require('../../handlers/get_location').get);
 router.get('/get_notes', require('../../handlers/get_notes').get);
+router.get('/get_statistics', require('../../handlers/get_statistics').get);
 router.get('/query_class', require('../../handlers/query_class').get);
 router.post('/release', require('../../handlers/release').post);
 router.get('/set_location', require('../../handlers/set_location').get);

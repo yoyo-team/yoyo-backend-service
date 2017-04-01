@@ -1,7 +1,15 @@
 let db=global.vars.db;
 let formidable=require('formidable');
 let path=require('path');
-let tear_down = require('/web/server/java/yoyo');
+let tear_down;
+try
+{
+    tear_down = require('/web/server/java/yoyo');
+}
+catch(e)
+{
+
+}
 
 module.exports.post=function(req,res)
 {
